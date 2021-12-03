@@ -1,0 +1,7 @@
+node_modules
+build
+yarn-error.log
+.env
+temp
+.metadata-cache/*
+image-upload/*
