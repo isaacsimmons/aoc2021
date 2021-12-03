@@ -23,32 +23,46 @@ const toNumber = (num: num): number => {
 const lines = new String(fs.readFileSync('input-3.txt')).split('\n').map(parseLine);
 console.log(lines);
 
-const count1s = (lines: num[]): buckets => {
-    const counts = new Array(lines[0].length).fill(0);
+const count1s = (lines: num[], idx: number): number => {
+    let count = 0;
 
+    lines.forEach(line => {
+        count += line[idx];
+    });
+
+    return count;
+};
+
+const filterO2 = (lines: num[], idx: number): num[] => {
+    const mostCommon = count1s(lines, idx) >= lines.length / 2 ? 1 : 0;
+    return lines.filter(line => line[idx] === mostCommon);
+};
+const filterCO2 = (lines: num[], idx: number): num[] => {
+    const mostCommon = count1s(lines, idx) >= lines.length / 2 ? 1 : 0;
+    return lines.filter(line => line[idx] !== mostCommon);
+};
+
+const findO2 = (lines: num[]): num => {
     for (let i = 0; i < lines[0].length; i++) {
-        lines.forEach(line => {
-            counts[i] += line[i];
-        });
+        lines = filterO2(lines, i);
+        if (lines.length === 1) {
+            return lines[0];
+        }
     }
-
-    return counts;
+    throw new Error();
+}
+const findCO2 = (lines: num[]): num => {
+    for (let i = 0; i < lines[0].length; i++) {
+        lines = filterCO2(lines, i);
+        if (lines.length === 1) {
+            return lines[0];
+        }
+    }
+    throw new Error();
 }
 
-const counts = count1s(lines);
-console.log(counts);
-
-const gamma = (counts: buckets, n: number): num => {
-    return counts.map(count => count > n/2 ? 1 : 0);
-};
-const epsilon = (counts: buckets, n: number): num => {
-    return counts.map(count => count < n/2 ? 1 : 0);
-};
-
-const g = gamma(counts, lines.length);
-const e = epsilon(counts, lines.length);
-
-const numG = toNumber(g);
-const numE = toNumber(e);
-
-console.log(numG, numE, numG * numE);
+const O2 = findO2(lines);
+const o2Num = toNumber(O2);
+const CO2 = findCO2(lines);
+const co2Num = toNumber(CO2);
+console.log(o2Num, co2Num, o2Num * co2Num);
