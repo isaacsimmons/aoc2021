@@ -75,8 +75,6 @@ const callNumber = (num: number, boards: Board[]) => {
 };
 
 const hasWon = (board: Board): boolean => {
-    console.log('checking');
-    console.log(board.marked);
     outer: for (let i = 0; i < board.values.length; i++) {
         inner: for (let j = 0; j < board.values[i].length; j++) {
             if (board.marked[i][j] === false) {
@@ -124,10 +122,10 @@ console.log(calls, boards);
 for (const call of calls) {
     callNumber(call, boards);
     const winners = findWinners(boards);
-    if (winners.length) {
+    if (winners.length === boards.length) {
         console.log('Board(s) number', winners, 'won');
         const scores = winners.map(winner => scoreBoard(boards[winner], call));
-        console.log(scores);
+        console.log(scores[9]);
         break;
     }
 }
