@@ -23,3 +23,4 @@ for (let pos = min; pos <= max; pos++) {
     }
 }
 console.log(bestPosition, lowestCost);
+
