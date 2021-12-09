@@ -15,6 +15,32 @@ const lines: number[][] = new String(fs.readFileSync('input-9.txt')).split('\n')
 const max: point = {x: lines[0].length, y: lines.length};
 const paintBoard: number[] = Array(max.x * max.y).fill(0);
 
+const isLowPoint = (x: number, y: number, grid: Grid): boolean => {
+    console.log(x, y);
+    if (x > 0) {
+        if (grid[y][x - 1] <= grid[y][x]) {
+            return false;
+        }
+    }
+    if (y > 0) {
+        if (grid[y-1][x] <= grid[y][x]) {
+            return false;
+        }
+    }
+    if (x < grid[y].length - 1) {
+        if (grid[y][x+1] <= grid[y][x]) {
+            return false;
+        }
+    }
+    if (y < grid.length - 1) {
+        if (grid[y+1][x] <= grid[y][x]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 let currentColor = 0;
 const colorUsage = new Map<number, number>();
 const getColor = () => {
