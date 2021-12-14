@@ -1,15 +1,5 @@
 import * as fs from 'fs';
 
-interface Point {
-    x: number;
-    y: number;
-}
-
-interface Fold {
-    direction: 'up' | 'left';
-    num: number;
-}
-
 interface Rule {
     match: string;
     insert: string;
@@ -75,22 +65,20 @@ const step = (state: ChunkedString, rules: Map<string, string>): ChunkedString =
 
 const mostAndLeastCommon = (b: Map<string, number>): {most: number, least: number} => {
     const frequencies = [...b.values()];
-    const maxFreq = Math.max(...frequencies);
-    const minFreq = Math.min(...frequencies);
-    return {most: maxFreq, least: minFreq};
+    const most = Math.max(...frequencies);
+    const least = Math.min(...frequencies);
+    return {most, least};
 }
 
 let state = chunkString(initialState);
 for (let stepNum = 1; stepNum <= 40; stepNum++) {
     state = step(state, ruleMap);
-    console.log('new state', stepNum);
-
 }
 
 const buckets = countChars(state);
 const {most, least} = mostAndLeastCommon(buckets);
 
-console.log(state);
-console.log(buckets);
-console.log(most, least);
+//console.log(state);
+//console.log(buckets);
+//console.log(most, least);
 console.log(most - least);
