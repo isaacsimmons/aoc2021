@@ -15,6 +15,8 @@ interface Rule {
     insert: string;
 }
 
+type ChunkedString = Map<string, number>;
+
 const parseRule = (input: string): Rule => {
     const [match, insert] = input.split(' -> ').map(l => l.trim());
     return {match, insert};
@@ -27,36 +29,48 @@ const rules = ruleInputs.map(parseRule);
 
 const ruleMap = new Map(rules.map(({match, insert}) => [match, insert]));
 
-const step = (state: string, rules: Map<string, string>): string => {
-    const after: string[] = [state[0]];
-
-    for (let i = 1; i < state.length; i++) {
-        const candidate = state.substring(i - 1, i + 1);
-      //  console.log(candidate);
-        const addition = ruleMap.get(candidate);
-        if (addition) {
-            after.push(addition);
-        }
-        after.push(state[i]);
-
+const chunkString = (s: string): ChunkedString => {
+    const chunks = new Map<string, number>();
+    for (let i = 0; i < s.length; i++) {
+        const chunk = s.substring(i, i + 2);
+        addToMap(chunks, chunk, 1);
     }
-
-    return after.join('');
+    return chunks;
 };
 
-const makeBuckets = (s: string): Map<string, number> => {
-    const b = new Map<string, number>();
+const countChars = (s: ChunkedString): Map<string, number> => {
+    const counts = new Map<string, number>();
+    for (const [chunk, count] of s.entries()) {
+        const c = chunk[0];
+        addToMap(counts, c, count);
+    }
+    return counts;
+};
 
-    for (let i = 0; i < s.length; i++) {
-        const c = s[i];
-        let match = b.get(c);
-        if (match) {
-            b.set(c, match + 1);
+const addToMap = <T>(map: Map<T, number>, key: T, quantity: number) => {
+    const oldValue = map.get(key);
+    if (oldValue) {
+        map.set(key, oldValue + quantity);
+    } else {
+        map.set(key, quantity);
+    }
+};
+
+const step = (state: ChunkedString, rules: Map<string, string>): ChunkedString => {
+    const after = new Map<string, number>();
+
+    for (const [chunk, count] of state.entries()) {
+        const addition = ruleMap.get(chunk);
+        if (addition) {
+            const new1 = chunk[0] + addition;
+            const new2 = addition + chunk[1];
+            addToMap(after, new1, count);
+            addToMap(after, new2, count);
         } else {
-            b.set(c, 1);
+            addToMap(after, chunk, count);
         }
     }
-    return b;
+    return after;
 };
 
 const mostAndLeastCommon = (b: Map<string, number>): {most: number, least: number} => {
@@ -64,27 +78,16 @@ const mostAndLeastCommon = (b: Map<string, number>): {most: number, least: numbe
     const maxFreq = Math.max(...frequencies);
     const minFreq = Math.min(...frequencies);
     return {most: maxFreq, least: minFreq};
-    // let most: string | null = null;
-    // let least: string | null = null;
-    // for (const [key, value] of b.entries()) {
-    //     if (value === maxFreq) {
-    //         most = key;
-    //     } else if (value === minFreq) {
-    //         least = key;
-    //     }
-    // }
-    // return {most: most!, least: least!};
 }
 
-//console.log(initialState, rules);
-
-let state = initialState;
+let state = chunkString(initialState);
 for (let stepNum = 1; stepNum <= 40; stepNum++) {
     state = step(state, ruleMap);
     console.log('new state', stepNum);
+
 }
 
-const buckets = makeBuckets(state);
+const buckets = countChars(state);
 const {most, least} = mostAndLeastCommon(buckets);
 
 console.log(state);
